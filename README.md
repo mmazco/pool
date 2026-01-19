@@ -1,6 +1,6 @@
-# Fuse Collective Pool
+# Fuse Pool
 
-A demo showcasing a "Collective Pool" feature for [Fuse Energy](https://privy.io/blog/rebuilding-the-energy-grid-with-fuse-energy) — neighbors pool $ENERGY rewards and earn together in perpetuity.
+A demo showcasing a "Pool" feature for [Fuse Energy](https://privy.io/blog/rebuilding-the-energy-grid-with-fuse-energy) — neighbors pool $ENERGY rewards and earn together in perpetuity.
 
 Built with Next.js + [Privy](https://privy.io) authentication. All pool data is mocked (localStorage).
 
@@ -35,7 +35,7 @@ Households earn $ENERGY individually
     └───────────────┘
 ```
 
-1. **Create a Pool** — Founder deploys a collective, earns 5% founder bonus on all distributions
+1. **Create a Pool** — Founder deploys a pool, earns 5% founder bonus on all distributions
 2. **Invite Neighbors** — Share link via WhatsApp/SMS/copy
 3. **Join the Pool** — Neighbors sign in with email, automatically added
 4. **Earn Together** — 10% of each member's $ENERGY flows to pool
