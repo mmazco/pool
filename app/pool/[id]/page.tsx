@@ -7,6 +7,8 @@ import { ensureSeeded, getPool, simulateDistribution, type Distribution, type Me
 import { MemberList } from '../../../components/member-list';
 import { SplitVisualization } from '../../../components/split-visualization';
 import { InviteActions } from '../../../components/invite-actions';
+import { ForecastCard } from '../../../components/forecast-card';
+import { DistributionAnimation } from '../../../components/distribution-animation';
 
 export default function PoolDashboardPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -25,6 +27,7 @@ function PoolDashboardInner({ poolId }: { poolId: string }) {
   const [distributions, setDistributions] = useState<Distribution[]>([]);
   const [notFound, setNotFound] = useState(false);
   const [showInvite, setShowInvite] = useState(false);
+  const [animatingDist, setAnimatingDist] = useState<Distribution | null>(null);
 
   const refresh = () => {
     ensureSeeded();
@@ -88,50 +91,48 @@ function PoolDashboardInner({ poolId }: { poolId: string }) {
             <div style={{ fontSize: 11, color: '#999', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 4 }}>Pool</div>
             <h1 style={{ fontSize: 28, fontWeight: 600, color: '#111', margin: 0 }}>{pool.name}</h1>
           </div>
-          <div style={{ display: 'flex', gap: 8, alignSelf: 'flex-end' }}>
-            <button
-              onClick={() => setShowInvite((v) => !v)}
-              style={{
-                padding: '10px 14px',
-                background: 'white',
-                color: '#111',
-                border: '1px solid #e5e5e5',
-                borderRadius: 8,
-                fontSize: 14,
-                fontWeight: 500,
-                cursor: 'pointer',
-                whiteSpace: 'nowrap',
-                height: 40,
-              }}
-            >
-              Invite neighbors
-            </button>
-            <button
-              onClick={() => {
-                simulateDistribution(pool.id);
-                refresh();
-              }}
-              style={{
-                padding: '10px 14px',
-                background: '#111',
-                color: 'white',
-                border: 'none',
-                borderRadius: 8,
-                fontSize: 14,
-                fontWeight: 500,
-                cursor: 'pointer',
-                whiteSpace: 'nowrap',
-                height: 40,
-              }}
-            >
-              Simulate distribution
-            </button>
-          </div>
+          <button
+            onClick={() => {
+              const dist = simulateDistribution(pool.id);
+              setAnimatingDist(dist);
+            }}
+            style={{
+              padding: '10px 14px',
+              background: '#111',
+              color: 'white',
+              border: 'none',
+              borderRadius: 8,
+              fontSize: 14,
+              fontWeight: 500,
+              cursor: 'pointer',
+              whiteSpace: 'nowrap',
+              height: 40,
+            }}
+          >
+            Simulate distribution
+          </button>
         </div>
 
         {showInvite ? (
           <div style={{ background: 'white', border: '1px solid #e5e5e5', borderRadius: 12, padding: 16, marginBottom: 24 }}>
-            <div style={{ fontSize: 12, color: '#999', marginBottom: 8 }}>Invite link</div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+              <div style={{ fontSize: 12, color: '#999' }}>Invite link</div>
+              <button
+                onClick={() => setShowInvite(false)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  padding: '4px 8px',
+                  fontSize: 18,
+                  color: '#999',
+                  cursor: 'pointer',
+                  lineHeight: 1,
+                }}
+                aria-label="Close invite panel"
+              >
+                ×
+              </button>
+            </div>
             <input
               value={inviteLink}
               readOnly
@@ -155,7 +156,19 @@ function PoolDashboardInner({ poolId }: { poolId: string }) {
             label="Your Share"
             value={`${yourShare >= 0 ? '+' : ''}${yourShare.toFixed(1)}`}
             sub={lastDist ? 'last distribution' : 'no distributions yet'}
-            valueColor="#22c55e"
+            valueColor="#007AFF"
+          />
+        </div>
+
+        {/* Growth Forecast - prominent placement */}
+        <div style={{ marginBottom: 24 }}>
+          <ForecastCard
+            pool={pool}
+            members={members}
+            isFounder={isFounder}
+            onInvite={() => setShowInvite(true)}
+            onRedeem={() => alert('Redeem flow coming soon! Your $ENERGY would be sent to your wallet.')}
+            redeemableAmount={viewer?.lifetimeReceived ?? yourShare}
           />
         </div>
 
@@ -167,7 +180,7 @@ function PoolDashboardInner({ poolId }: { poolId: string }) {
           <MemberList pool={pool} members={members} viewerUserId={user?.id} />
         </div>
 
-        <div style={{ background: 'white', border: '1px solid #e5e5e5', borderRadius: 12, overflow: 'hidden' }}>
+        <div style={{ background: 'white', border: '1px solid #e5e5e5', borderRadius: 12, overflow: 'hidden', marginBottom: 24 }}>
           <div style={{ padding: 20, borderBottom: '1px solid #f0f0f0' }}>
             <div style={{ fontSize: 11, color: '#999', textTransform: 'uppercase', letterSpacing: 0.5 }}>Recent Distributions</div>
           </div>
@@ -175,7 +188,7 @@ function PoolDashboardInner({ poolId }: { poolId: string }) {
             {distributions.length === 0 ? (
               <div style={{ padding: '12px 0', fontSize: 14, color: '#666' }}>No distributions yet.</div>
             ) : (
-              distributions.slice(0, 6).map((d, i) => (
+              distributions.slice(0, 5).map((d, i) => (
                 <div
                   key={d.id}
                   style={{
@@ -183,17 +196,30 @@ function PoolDashboardInner({ poolId }: { poolId: string }) {
                     justifyContent: 'space-between',
                     alignItems: 'center',
                     padding: '12px 0',
-                    borderBottom: i < Math.min(5, distributions.length - 1) ? '1px solid #f0f0f0' : 'none',
+                    borderBottom: i < Math.min(4, distributions.length - 1) ? '1px solid #f0f0f0' : 'none',
                   }}
                 >
                   <span style={{ fontSize: 14, color: '#666' }}>{formatDate(d.createdAt)}</span>
-                  <span style={{ fontSize: 14, fontWeight: 500, color: '#22c55e' }}>+{d.poolAmount.toFixed(1)}</span>
+                  <span style={{ fontSize: 14, fontWeight: 500, color: '#007AFF' }}>+{d.poolAmount.toFixed(1)}</span>
                 </div>
               ))
             )}
           </div>
         </div>
       </div>
+
+      {/* Distribution Animation Modal */}
+      {animatingDist && (
+        <DistributionAnimation
+          pool={pool}
+          members={members}
+          distribution={animatingDist}
+          onComplete={() => {
+            setAnimatingDist(null);
+            refresh();
+          }}
+        />
+      )}
     </main>
   );
 }

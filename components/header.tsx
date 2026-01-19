@@ -42,7 +42,7 @@ export function Header() {
         Fuse Pool
       </a>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
         {!ready ? (
           <span style={{ fontSize: 13, color: '#999' }}>Loading...</span>
         ) : !authenticated ? (
@@ -63,6 +63,19 @@ export function Header() {
           </button>
         ) : (
           <>
+            <a
+              href="/network"
+              style={{
+                fontSize: 13,
+                color: '#666',
+                textDecoration: 'none',
+                padding: '8px 12px',
+                borderRadius: 6,
+                background: '#f5f5f5',
+              }}
+            >
+              Network
+            </a>
             <span style={{ fontSize: 13, color: '#666' }}>{displayName}</span>
             <button
               onClick={logout}

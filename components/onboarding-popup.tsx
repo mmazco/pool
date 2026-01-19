@@ -65,7 +65,7 @@ export function PoolOnboardingPopup({
             ))}
             <div
               style={{
-                background: '#f0fdf4',
+                background: '#EBF5FF',
                 border: '1px solid #bbf7d0',
                 borderRadius: 8,
                 padding: '12px 16px',
@@ -90,7 +90,7 @@ export function PoolOnboardingPopup({
                 'A bigger share back to you, every distribution',
               ].map((text, i) => (
                 <div key={i} style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-                  <span style={{ color: '#22c55e' }}>↑</span>
+                  <span style={{ color: '#007AFF' }}>↑</span>
                   <p style={{ fontSize: 14, color: '#666', margin: 0 }}>{text}</p>
                 </div>
               ))}
@@ -117,7 +117,7 @@ export function PoolOnboardingPopup({
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
                 <span>Founder bonus (5%)</span>
-                <span style={{ color: '#22c55e', fontWeight: 500 }}>+5.0</span>
+                <span style={{ color: '#007AFF', fontWeight: 500 }}>+5.0</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: 8, borderTop: '1px solid #e5e5e5' }}>
                 <span>Each member (4 total)</span>

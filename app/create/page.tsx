@@ -1,14 +1,22 @@
 'use client';
 
-import { AuthGate } from '../../components/auth-gate';
-import { useEffect, useMemo, useState } from 'react';
+import { Suspense, useEffect, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { AuthGate } from '../../components/auth-gate';
 import { createPool, ensureSeeded, getPoolPreview } from '../../lib/store';
 import { usePrivy } from '@privy-io/react-auth';
 import { InviteActions } from '../../components/invite-actions';
 import { Card, CardBody, Label, Page, PrimaryButton, Subtitle, Title } from '../../components/ui';
 
 export default function CreatePoolPage() {
+  return (
+    <Suspense fallback={<Page><div style={{ padding: 40, textAlign: 'center', color: '#666' }}>Loading...</div></Page>}>
+      <CreatePoolPageInner />
+    </Suspense>
+  );
+}
+
+function CreatePoolPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const createdId = searchParams.get('created');
@@ -84,7 +92,7 @@ function CreatePoolInner({
                 style={{
                   width: 64,
                   height: 64,
-                  background: '#f0fdf4',
+                  background: '#EBF5FF',
                   borderRadius: '50%',
                   margin: '0 auto 16px auto',
                   display: 'flex',
