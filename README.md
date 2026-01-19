@@ -1,6 +1,6 @@
-# Fuse Pool
+# Fuse Pool (not associated with Fuse Energy)
 
-A demo showcasing a "Pool" feature for [Fuse Energy](https://privy.io/blog/rebuilding-the-energy-grid-with-fuse-energy) — neighbors pool $ENERGY rewards and earn together in perpetuity.
+A demo showcasing a "Pool" feature simulation for [Fuse Energy](https://privy.io/blog/rebuilding-the-energy-grid-with-fuse-energy) — neighbors pool $ENERGY rewards and earn together in perpetuity.
 
 Built with Next.js + [Privy](https://privy.io) authentication. All pool data is mocked (localStorage).
 
