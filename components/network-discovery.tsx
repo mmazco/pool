@@ -273,11 +273,15 @@ export function NetworkDiscovery() {
             </div>
 
             {/* Discovered nodes */}
-            {discovered.map((node) => {
+            {discovered.map((node, index) => {
               const x = 50 + Math.cos(node.angle) * node.distance * 45;
               const y = 50 + Math.sin(node.angle) * node.distance * 45;
               const isPool = node.type === 'pool';
               const isSelected = selected?.id === node.id;
+              
+              // Vibrant colors for houses
+              const houseColors = ['#FF6B9D', '#A3E635', '#4ADE80', '#22D3EE', '#FBBF24', '#F472B6'];
+              const nodeColor = isPool ? '#007AFF' : houseColors[index % houseColors.length];
 
               return (
                 <button
@@ -291,12 +295,12 @@ export function NetworkDiscovery() {
                     width: isPool ? 56 : 40,
                     height: isPool ? 56 : 40,
                     borderRadius: isPool ? 12 : '50%',
-                    background: '#007AFF',
+                    background: nodeColor,
                     border: isSelected ? '3px solid #111' : '2px solid white',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    color: 'white',
+                    color: isPool ? 'white' : '#333',
                     fontSize: isPool ? 11 : 14,
                     fontWeight: 500,
                     cursor: 'pointer',
@@ -465,11 +469,13 @@ export function NetworkDiscovery() {
                         width: 36,
                         height: 36,
                         borderRadius: node.type === 'pool' ? 8 : '50%',
-                        background: '#007AFF',
+                        background: node.type === 'pool' 
+                          ? '#007AFF' 
+                          : ['#FF6B9D', '#A3E635', '#4ADE80', '#22D3EE', '#FBBF24', '#F472B6'][i % 6],
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        color: 'white',
+                        color: node.type === 'pool' ? 'white' : '#333',
                         fontSize: node.type === 'pool' ? 11 : 14,
                       }}
                     >
