@@ -31,6 +31,17 @@ const MOCK_NEARBY: Omit<DiscoveredNode, 'discoveredAt'>[] = [
 
 type ScanPhase = 'idle' | 'scanning' | 'complete';
 
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 640);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
+  return isMobile;
+}
+
 export function NetworkDiscovery() {
   const router = useRouter();
   const { user } = usePrivy();
@@ -40,6 +51,7 @@ export function NetworkDiscovery() {
   const [selected, setSelected] = useState<DiscoveredNode | null>(null);
   const [inviteSent, setInviteSent] = useState<Set<string>>(new Set());
   const [joinRequested, setJoinRequested] = useState<Set<string>>(new Set());
+  const isMobile = useIsMobile();
 
   const startScan = useCallback(() => {
     setPhase('scanning');
@@ -162,7 +174,7 @@ export function NetworkDiscovery() {
   const pools = discovered.filter((d) => d.type === 'pool');
 
   return (
-    <main style={{ minHeight: '100vh', padding: '40px 20px', display: 'flex', justifyContent: 'center' }}>
+    <main style={{ minHeight: '100vh', padding: isMobile ? '24px 16px' : '40px 20px', display: 'flex', justifyContent: 'center' }}>
       <div style={{ width: '100%', maxWidth: 800 }}>
         <button
           onClick={() => router.back()}
@@ -172,20 +184,21 @@ export function NetworkDiscovery() {
             gap: 4,
             background: 'none',
             border: 'none',
-            padding: 0,
+            padding: '8px 0',
             marginBottom: 16,
             fontSize: 14,
             color: '#007AFF',
             cursor: 'pointer',
+            minHeight: 44,
           }}
         >
           ← Back
         </button>
-        <div style={{ marginBottom: 32 }}>
+        <div style={{ marginBottom: isMobile ? 24 : 32 }}>
           <div style={{ fontSize: 11, color: '#999', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 4 }}>
             Energy Network
           </div>
-          <h1 style={{ fontSize: 28, fontWeight: 600, color: '#111', margin: 0 }}>Discover Neighbors</h1>
+          <h1 style={{ fontSize: isMobile ? 24 : 28, fontWeight: 600, color: '#111', margin: 0 }}>Discover Neighbors</h1>
           <p style={{ fontSize: 14, color: '#666', marginTop: 8, lineHeight: 1.5 }}>
             Find other Fuse households in your area. Invite them to your Pool or join an existing one.
           </p>
@@ -197,15 +210,15 @@ export function NetworkDiscovery() {
             background: 'white',
             border: '1px solid #e5e5e5',
             borderRadius: 16,
-            padding: 32,
-            marginBottom: 24,
+            padding: isMobile ? 16 : 32,
+            marginBottom: isMobile ? 16 : 24,
           }}
         >
           <div
             style={{
               position: 'relative',
               width: '100%',
-              maxWidth: 400,
+              maxWidth: isMobile ? 300 : 400,
               aspectRatio: '1',
               margin: '0 auto',
               borderRadius: '50%',
@@ -356,11 +369,17 @@ export function NetworkDiscovery() {
               background: 'white',
               border: '1px solid #e5e5e5',
               borderRadius: 12,
-              padding: 20,
-              marginBottom: 24,
+              padding: isMobile ? 16 : 20,
+              marginBottom: isMobile ? 16 : 24,
             }}
           >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <div style={{ 
+              display: 'flex', 
+              flexDirection: isMobile ? 'column' : 'row',
+              justifyContent: 'space-between', 
+              alignItems: isMobile ? 'stretch' : 'flex-start',
+              gap: isMobile ? 16 : 12,
+            }}>
               <div>
                 <div
                   style={{
@@ -377,7 +396,7 @@ export function NetworkDiscovery() {
                 >
                   {selected.type === 'pool' ? 'Pool' : 'House'}
                 </div>
-                <h3 style={{ margin: 0, fontSize: 18, fontWeight: 600, color: '#111' }}>{selected.name}</h3>
+                <h3 style={{ margin: 0, fontSize: isMobile ? 16 : 18, fontWeight: 600, color: '#111' }}>{selected.name}</h3>
                 {selected.type === 'pool' && (
                   <p style={{ margin: '4px 0 0 0', fontSize: 13, color: '#666' }}>
                     {selected.memberCount} members · Est. ~{Math.round((selected.memberCount || 1) * 15)} $ENERGY/week
@@ -385,7 +404,7 @@ export function NetworkDiscovery() {
                 )}
               </div>
 
-              <div>
+              <div style={{ flexShrink: 0 }}>
                 {selected.type === 'house' ? (
                   inviteSent.has(selected.id) ? (
                     <span style={{ fontSize: 13, color: '#007AFF', fontWeight: 500 }}>Invite sent</span>
@@ -393,7 +412,8 @@ export function NetworkDiscovery() {
                     <button
                       onClick={() => handleInvite(selected)}
                       style={{
-                        padding: '10px 16px',
+                        width: isMobile ? '100%' : 'auto',
+                        padding: isMobile ? '14px 16px' : '10px 16px',
                         background: '#007AFF',
                         color: 'white',
                         border: 'none',
@@ -401,6 +421,7 @@ export function NetworkDiscovery() {
                         fontSize: 14,
                         fontWeight: 500,
                         cursor: 'pointer',
+                        minHeight: 44,
                       }}
                     >
                       Invite to my Pool
@@ -412,7 +433,8 @@ export function NetworkDiscovery() {
                   <button
                     onClick={() => handleJoinPool(selected)}
                     style={{
-                      padding: '10px 16px',
+                      width: isMobile ? '100%' : 'auto',
+                      padding: isMobile ? '14px 16px' : '10px 16px',
                       background: '#007AFF',
                       color: 'white',
                       border: 'none',
@@ -420,6 +442,7 @@ export function NetworkDiscovery() {
                       fontSize: 14,
                       fontWeight: 500,
                       cursor: 'pointer',
+                      minHeight: 44,
                     }}
                   >
                     Join this Pool
@@ -440,7 +463,7 @@ export function NetworkDiscovery() {
               overflow: 'hidden',
             }}
           >
-            <div style={{ padding: 16, borderBottom: '1px solid #f0f0f0' }}>
+            <div style={{ padding: isMobile ? 12 : 16, borderBottom: '1px solid #f0f0f0' }}>
               <div style={{ fontSize: 11, color: '#999', textTransform: 'uppercase', letterSpacing: 0.5 }}>
                 Discovered ({discovered.length})
               </div>
@@ -455,15 +478,17 @@ export function NetworkDiscovery() {
                     alignItems: 'center',
                     justifyContent: 'space-between',
                     width: '100%',
-                    padding: '12px 16px',
+                    padding: isMobile ? '12px 12px' : '12px 16px',
                     background: selected?.id === node.id ? '#fafafa' : 'white',
                     border: 'none',
                     borderBottom: i < discovered.length - 1 ? '1px solid #f0f0f0' : 'none',
                     cursor: 'pointer',
                     textAlign: 'left',
+                    gap: 12,
+                    minHeight: 56,
                   }}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? 10 : 12, minWidth: 0, flex: 1 }}>
                     <div
                       style={{
                         width: 36,
@@ -477,26 +502,35 @@ export function NetworkDiscovery() {
                         justifyContent: 'center',
                         color: node.type === 'pool' ? 'white' : '#333',
                         fontSize: node.type === 'pool' ? 11 : 14,
+                        flexShrink: 0,
                       }}
                     >
                       {node.type === 'pool' ? node.memberCount : '🏠'}
                     </div>
-                    <div>
-                      <div style={{ fontSize: 14, fontWeight: 500, color: '#111' }}>{node.name}</div>
+                    <div style={{ minWidth: 0, flex: 1 }}>
+                      <div style={{ 
+                        fontSize: isMobile ? 13 : 14, 
+                        fontWeight: 500, 
+                        color: '#111',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                      }}>
+                        {node.name}
+                      </div>
                       <div style={{ fontSize: 12, color: '#999' }}>
                         {node.type === 'pool' ? `${node.memberCount} members` : 'Individual house'}
                       </div>
                     </div>
-
                   </div>
-                  <div style={{ fontSize: 12, color: '#999' }}>
+                  <div style={{ fontSize: 12, color: '#999', flexShrink: 0 }}>
                     {node.type === 'house'
                       ? inviteSent.has(node.id)
                         ? 'Invited'
-                        : 'Tap to invite'
+                        : isMobile ? 'Invite' : 'Tap to invite'
                       : joinRequested.has(node.id)
                       ? 'Joined'
-                      : 'Tap to join'}
+                      : isMobile ? 'Join' : 'Tap to join'}
                   </div>
                 </button>
               ))}
@@ -506,11 +540,12 @@ export function NetworkDiscovery() {
 
         {/* Create pool CTA */}
         {phase === 'complete' && houses.length > 0 && (
-          <div style={{ marginTop: 24, textAlign: 'center' }}>
+          <div style={{ marginTop: isMobile ? 16 : 24, textAlign: 'center' }}>
             <button
               onClick={handleCreatePoolWithInvites}
               style={{
-                padding: '14px 24px',
+                width: isMobile ? '100%' : 'auto',
+                padding: isMobile ? '14px 24px' : '14px 24px',
                 background: '#111',
                 color: 'white',
                 border: 'none',
@@ -518,11 +553,12 @@ export function NetworkDiscovery() {
                 fontSize: 15,
                 fontWeight: 500,
                 cursor: 'pointer',
+                minHeight: 48,
               }}
             >
               Create new Pool & invite all
             </button>
-            <p style={{ fontSize: 12, color: '#999', marginTop: 8 }}>
+            <p style={{ fontSize: 12, color: '#999', marginTop: 8, padding: '0 16px' }}>
               Start your own neighborhood Pool and invite discovered houses
             </p>
           </div>

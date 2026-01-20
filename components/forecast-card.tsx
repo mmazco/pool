@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useEffect, useState } from 'react';
 import type { Pool, Member } from '../lib/store';
 
 type ForecastCardProps = {
@@ -12,8 +12,20 @@ type ForecastCardProps = {
   redeemableAmount?: number;
 };
 
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 640);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
+  return isMobile;
+}
+
 export function ForecastCard({ pool, members, isFounder, onInvite, onRedeem, redeemableAmount = 0 }: ForecastCardProps) {
   const currentCount = members.length;
+  const isMobile = useIsMobile();
 
   // Assume average weekly contribution per member is ~50 $ENERGY (10% of ~500 earned)
   const avgContributionPerMember = 50;
@@ -53,12 +65,14 @@ export function ForecastCard({ pool, members, isFounder, onInvite, onRedeem, red
         overflow: 'hidden',
       }}
     >
-      <div style={{ padding: 20, borderBottom: '1px solid #f0f0f0' }}>
+      <div style={{ padding: isMobile ? 16 : 20, borderBottom: '1px solid #f0f0f0' }}>
         <div
           style={{
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: 8,
           }}
         >
           <div
@@ -83,14 +97,16 @@ export function ForecastCard({ pool, members, isFounder, onInvite, onRedeem, red
         </div>
       </div>
 
-      <div style={{ padding: 20 }}>
+      <div style={{ padding: isMobile ? 16 : 20 }}>
         {/* Current state */}
         <div
           style={{
             display: 'flex',
+            flexDirection: isMobile ? 'column' : 'row',
             justifyContent: 'space-between',
-            alignItems: 'center',
-            padding: '12px 16px',
+            alignItems: isMobile ? 'flex-start' : 'center',
+            gap: isMobile ? 8 : 16,
+            padding: isMobile ? '12px 12px' : '12px 16px',
             background: '#EBF5FF',
             borderRadius: 8,
             marginBottom: 16,
@@ -104,7 +120,7 @@ export function ForecastCard({ pool, members, isFounder, onInvite, onRedeem, red
               Your weekly share
             </div>
           </div>
-          <div style={{ fontSize: 20, fontWeight: 600, color: '#007AFF' }}>
+          <div style={{ fontSize: isMobile ? 18 : 20, fontWeight: 600, color: '#007AFF' }}>
             ~{current.yourShare} $ENERGY
           </div>
         </div>
@@ -120,16 +136,18 @@ export function ForecastCard({ pool, members, isFounder, onInvite, onRedeem, red
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
-                  padding: '10px 16px',
+                  padding: isMobile ? '10px 12px' : '10px 16px',
                   background: '#fafafa',
                   borderRadius: 8,
+                  flexWrap: 'wrap',
+                  gap: 8,
                 }}
               >
-                <div style={{ fontSize: 14, color: '#666' }}>
+                <div style={{ fontSize: isMobile ? 13 : 14, color: '#666' }}>
                   With {proj.neighbors} neighbors
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <span style={{ fontSize: 14, fontWeight: 500, color: '#111' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? 8 : 12 }}>
+                  <span style={{ fontSize: isMobile ? 13 : 14, fontWeight: 500, color: '#111' }}>
                     ~{proj.yourShare}
                   </span>
                   <span
@@ -151,13 +169,13 @@ export function ForecastCard({ pool, members, isFounder, onInvite, onRedeem, red
         </div>
 
         {/* CTAs */}
-        <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
+        <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: 8, marginTop: 16 }}>
           {onInvite && (
             <button
               onClick={onInvite}
               style={{
                 flex: 1,
-                padding: '12px 16px',
+                padding: isMobile ? '14px 16px' : '12px 16px',
                 background: 'white',
                 color: '#111',
                 border: '1px solid #e5e5e5',
@@ -165,6 +183,7 @@ export function ForecastCard({ pool, members, isFounder, onInvite, onRedeem, red
                 fontSize: 14,
                 fontWeight: 500,
                 cursor: 'pointer',
+                minHeight: 44,
               }}
             >
               Invite neighbors
@@ -175,7 +194,7 @@ export function ForecastCard({ pool, members, isFounder, onInvite, onRedeem, red
               onClick={onRedeem}
               style={{
                 flex: 1,
-                padding: '12px 16px',
+                padding: isMobile ? '14px 16px' : '12px 16px',
                 background: '#007AFF',
                 color: 'white',
                 border: 'none',
@@ -183,6 +202,7 @@ export function ForecastCard({ pool, members, isFounder, onInvite, onRedeem, red
                 fontSize: 14,
                 fontWeight: 500,
                 cursor: 'pointer',
+                minHeight: 44,
               }}
             >
               Redeem {redeemableAmount > 0 ? `${redeemableAmount.toFixed(1)}` : ''}

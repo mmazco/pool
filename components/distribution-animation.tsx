@@ -12,6 +12,17 @@ type DistributionAnimationProps = {
 
 type AnimationPhase = 'idle' | 'pool' | 'founder' | 'split' | 'members' | 'complete';
 
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 640);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
+  return isMobile;
+}
+
 export function DistributionAnimation({
   pool,
   members,
@@ -22,6 +33,7 @@ export function DistributionAnimation({
   const [countedAmount, setCountedAmount] = useState(0);
   const [founderAmount, setFounderAmount] = useState(0);
   const [memberAmounts, setMemberAmounts] = useState<number[]>(members.map(() => 0));
+  const isMobile = useIsMobile();
 
   const totalAmount = distribution.poolAmount;
   const founderBonus = totalAmount * (pool.founderBonusBps / 10_000);
@@ -101,10 +113,10 @@ export function DistributionAnimation({
         inset: 0,
         background: 'rgba(0, 0, 0, 0.6)',
         display: 'flex',
-        alignItems: 'center',
+        alignItems: isMobile ? 'flex-end' : 'center',
         justifyContent: 'center',
         zIndex: 1000,
-        padding: 20,
+        padding: isMobile ? 0 : 20,
       }}
       onClick={(e) => {
         if (e.target === e.currentTarget && phase === 'complete') onComplete();
@@ -113,19 +125,23 @@ export function DistributionAnimation({
       <div
         style={{
           background: 'white',
-          borderRadius: 16,
+          borderRadius: isMobile ? '16px 16px 0 0' : 16,
           width: '100%',
-          maxWidth: 400,
+          maxWidth: isMobile ? '100%' : 400,
+          maxHeight: isMobile ? '90vh' : 'auto',
           overflow: 'hidden',
+          display: 'flex',
+          flexDirection: 'column',
         }}
       >
         <div
           style={{
-            padding: '20px 24px',
+            padding: isMobile ? '16px 20px' : '20px 24px',
             borderBottom: '1px solid #f0f0f0',
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
+            flexShrink: 0,
           }}
         >
           <div style={{ fontSize: 11, color: '#999', textTransform: 'uppercase', letterSpacing: 0.5 }}>
@@ -140,19 +156,26 @@ export function DistributionAnimation({
                 fontSize: 18,
                 color: '#999',
                 cursor: 'pointer',
+                padding: 8,
+                margin: -8,
+                minWidth: 44,
+                minHeight: 44,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
             >
-              x
+              ×
             </button>
           )}
         </div>
 
-        <div style={{ padding: 24 }}>
+        <div style={{ padding: isMobile ? 20 : 24, overflowY: 'auto', flex: 1 }}>
           {/* Pool total */}
           <div
             style={{
               textAlign: 'center',
-              marginBottom: 24,
+              marginBottom: isMobile ? 20 : 24,
               opacity: getPhaseOpacity('pool'),
               transition: 'opacity 0.3s ease',
             }}
@@ -160,7 +183,7 @@ export function DistributionAnimation({
             <div style={{ fontSize: 12, color: '#999', marginBottom: 4 }}>Pool Total</div>
             <div
               style={{
-                fontSize: 36,
+                fontSize: isMobile ? 32 : 36,
                 fontWeight: 600,
                 color: '#111',
                 fontVariantNumeric: 'tabular-nums',
@@ -308,7 +331,7 @@ export function DistributionAnimation({
               style={{
                 width: '100%',
                 marginTop: 20,
-                padding: '12px 16px',
+                padding: isMobile ? '14px 16px' : '12px 16px',
                 background: '#007AFF',
                 color: 'white',
                 border: 'none',
@@ -316,6 +339,7 @@ export function DistributionAnimation({
                 fontSize: 14,
                 fontWeight: 500,
                 cursor: 'pointer',
+                minHeight: 48,
               }}
             >
               Done

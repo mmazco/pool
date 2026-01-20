@@ -20,6 +20,17 @@ export default function PoolDashboardPage({ params }: { params: Promise<{ id: st
   );
 }
 
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 640);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
+  return isMobile;
+}
+
 function PoolDashboardInner({ poolId }: { poolId: string }) {
   const { user } = usePrivy();
   const [pool, setPool] = useState<Pool | null>(null);
@@ -28,6 +39,7 @@ function PoolDashboardInner({ poolId }: { poolId: string }) {
   const [notFound, setNotFound] = useState(false);
   const [showInvite, setShowInvite] = useState(false);
   const [animatingDist, setAnimatingDist] = useState<Distribution | null>(null);
+  const isMobile = useIsMobile();
 
   const refresh = () => {
     ensureSeeded();
@@ -62,9 +74,9 @@ function PoolDashboardInner({ poolId }: { poolId: string }) {
 
   if (notFound) {
     return (
-      <main style={{ minHeight: '100vh', display: 'grid', placeItems: 'center', padding: '40px 20px' }}>
-        <div style={{ width: '100%', maxWidth: 520, background: 'white', border: '1px solid #e5e5e5', borderRadius: 16, padding: 24 }}>
-          <h1 style={{ margin: 0, fontSize: 22, fontWeight: 600, color: '#111' }}>Pool not found</h1>
+      <main style={{ minHeight: '100vh', display: 'grid', placeItems: 'center', padding: '40px 16px' }}>
+        <div style={{ width: '100%', maxWidth: 520, background: 'white', border: '1px solid #e5e5e5', borderRadius: 16, padding: isMobile ? 20 : 24 }}>
+          <h1 style={{ margin: 0, fontSize: isMobile ? 20 : 22, fontWeight: 600, color: '#111' }}>Pool not found</h1>
           <p style={{ margin: '8px 0 0 0', fontSize: 14, color: '#666', lineHeight: 1.5 }}>
             This Pool may not exist on this device yet. Try opening the invite link first, or create a new Pool.
           </p>
@@ -84,12 +96,19 @@ function PoolDashboardInner({ poolId }: { poolId: string }) {
   const inviteLink = typeof window === 'undefined' ? `/join/${pool.id}` : new URL(`/join/${pool.id}`, window.location.origin).toString();
 
   return (
-    <main style={{ minHeight: '100vh', padding: '40px 20px', display: 'flex', justifyContent: 'center' }}>
+    <main style={{ minHeight: '100vh', padding: isMobile ? '24px 16px' : '40px 20px', display: 'flex', justifyContent: 'center' }}>
       <div style={{ width: '100%', maxWidth: 900 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16, marginBottom: 32 }}>
+        <div style={{ 
+          display: 'flex', 
+          flexDirection: isMobile ? 'column' : 'row',
+          justifyContent: 'space-between', 
+          alignItems: isMobile ? 'stretch' : 'flex-start', 
+          gap: 16, 
+          marginBottom: isMobile ? 24 : 32 
+        }}>
           <div>
             <div style={{ fontSize: 11, color: '#999', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 4 }}>Pool</div>
-            <h1 style={{ fontSize: 28, fontWeight: 600, color: '#111', margin: 0 }}>{pool.name}</h1>
+            <h1 style={{ fontSize: isMobile ? 24 : 28, fontWeight: 600, color: '#111', margin: 0 }}>{pool.name}</h1>
           </div>
           <button
             onClick={() => {
@@ -97,7 +116,7 @@ function PoolDashboardInner({ poolId }: { poolId: string }) {
               setAnimatingDist(dist);
             }}
             style={{
-              padding: '10px 14px',
+              padding: isMobile ? '12px 16px' : '10px 14px',
               background: '#111',
               color: 'white',
               border: 'none',
@@ -106,7 +125,7 @@ function PoolDashboardInner({ poolId }: { poolId: string }) {
               fontWeight: 500,
               cursor: 'pointer',
               whiteSpace: 'nowrap',
-              height: 40,
+              minHeight: 44,
             }}
           >
             Simulate distribution
@@ -114,7 +133,7 @@ function PoolDashboardInner({ poolId }: { poolId: string }) {
         </div>
 
         {showInvite ? (
-          <div style={{ background: 'white', border: '1px solid #e5e5e5', borderRadius: 12, padding: 16, marginBottom: 24 }}>
+          <div style={{ background: 'white', border: '1px solid #e5e5e5', borderRadius: 12, padding: isMobile ? 12 : 16, marginBottom: isMobile ? 16 : 24 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
               <div style={{ fontSize: 12, color: '#999' }}>Invite link</div>
               <button
@@ -127,6 +146,8 @@ function PoolDashboardInner({ poolId }: { poolId: string }) {
                   color: '#999',
                   cursor: 'pointer',
                   lineHeight: 1,
+                  minWidth: 44,
+                  minHeight: 44,
                 }}
                 aria-label="Close invite panel"
               >
@@ -143,6 +164,7 @@ function PoolDashboardInner({ poolId }: { poolId: string }) {
                 borderRadius: 8,
                 background: '#fafafa',
                 color: '#666',
+                fontSize: isMobile ? 13 : 14,
                 marginBottom: 12,
               }}
             />
@@ -150,18 +172,24 @@ function PoolDashboardInner({ poolId }: { poolId: string }) {
           </div>
         ) : null}
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 24 }}>
-          <StatCard label="Pool Balance" value={pool.totalPooledLifetime.toFixed(1)} sub="$ENERGY" />
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', 
+          gap: isMobile ? 12 : 16, 
+          marginBottom: isMobile ? 16 : 24 
+        }}>
+          <StatCard label="Pool Balance" value={pool.totalPooledLifetime.toFixed(1)} sub="$ENERGY" isMobile={isMobile} />
           <StatCard
             label="Your Share"
             value={`${yourShare >= 0 ? '+' : ''}${yourShare.toFixed(1)}`}
             sub={lastDist ? 'last distribution' : 'no distributions yet'}
             valueColor="#007AFF"
+            isMobile={isMobile}
           />
         </div>
 
         {/* Growth Forecast - prominent placement */}
-        <div style={{ marginBottom: 24 }}>
+        <div style={{ marginBottom: isMobile ? 16 : 24 }}>
           <ForecastCard
             pool={pool}
             members={members}
@@ -172,19 +200,19 @@ function PoolDashboardInner({ poolId }: { poolId: string }) {
           />
         </div>
 
-        <div style={{ background: 'white', border: '1px solid #e5e5e5', borderRadius: 12, marginBottom: 24, overflow: 'hidden' }}>
+        <div style={{ background: 'white', border: '1px solid #e5e5e5', borderRadius: 12, marginBottom: isMobile ? 16 : 24, overflow: 'hidden' }}>
           <SplitVisualization pool={pool} members={members} />
         </div>
 
-        <div style={{ marginBottom: 24 }}>
+        <div style={{ marginBottom: isMobile ? 16 : 24 }}>
           <MemberList pool={pool} members={members} viewerUserId={user?.id} />
         </div>
 
-        <div style={{ background: 'white', border: '1px solid #e5e5e5', borderRadius: 12, overflow: 'hidden', marginBottom: 24 }}>
-          <div style={{ padding: 20, borderBottom: '1px solid #f0f0f0' }}>
+        <div style={{ background: 'white', border: '1px solid #e5e5e5', borderRadius: 12, overflow: 'hidden', marginBottom: isMobile ? 16 : 24 }}>
+          <div style={{ padding: isMobile ? 16 : 20, borderBottom: '1px solid #f0f0f0' }}>
             <div style={{ fontSize: 11, color: '#999', textTransform: 'uppercase', letterSpacing: 0.5 }}>Recent Distributions</div>
           </div>
-          <div style={{ padding: '8px 20px' }}>
+          <div style={{ padding: isMobile ? '8px 16px' : '8px 20px' }}>
             {distributions.length === 0 ? (
               <div style={{ padding: '12px 0', fontSize: 14, color: '#666' }}>No distributions yet.</div>
             ) : (
@@ -229,16 +257,18 @@ function StatCard({
   value,
   sub,
   valueColor = '#111',
+  isMobile = false,
 }: {
   label: string;
   value: string;
   sub: string;
   valueColor?: string;
+  isMobile?: boolean;
 }) {
   return (
-    <div style={{ background: 'white', border: '1px solid #e5e5e5', borderRadius: 12, padding: 20 }}>
+    <div style={{ background: 'white', border: '1px solid #e5e5e5', borderRadius: 12, padding: isMobile ? 16 : 20 }}>
       <div style={{ fontSize: 11, color: '#999', textTransform: 'uppercase', letterSpacing: 0.5 }}>{label}</div>
-      <div style={{ fontSize: 32, fontWeight: 600, color: valueColor, marginTop: 8 }}>{value}</div>
+      <div style={{ fontSize: isMobile ? 28 : 32, fontWeight: 600, color: valueColor, marginTop: 8 }}>{value}</div>
       <div style={{ fontSize: 13, color: '#999' }}>{sub}</div>
     </div>
   );

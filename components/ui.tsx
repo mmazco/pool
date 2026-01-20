@@ -8,7 +8,7 @@ export function Page({ children }: { children: React.ReactNode }) {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '40px 20px',
+        padding: '24px 16px',
       }}
     >
       {children}
@@ -40,7 +40,7 @@ export function Card({
 }
 
 export function CardBody({ children }: { children: React.ReactNode }) {
-  return <div style={{ padding: 24 }}>{children}</div>;
+  return <div style={{ padding: '20px 16px' }}>{children}</div>;
 }
 
 export function Label({ children }: { children: React.ReactNode }) {
@@ -50,7 +50,7 @@ export function Label({ children }: { children: React.ReactNode }) {
 }
 
 export function Title({ children }: { children: React.ReactNode }) {
-  return <h1 style={{ margin: '8px 0 8px 0', fontSize: 24, fontWeight: 600, color: '#111' }}>{children}</h1>;
+  return <h1 style={{ margin: '8px 0 8px 0', fontSize: 22, fontWeight: 600, color: '#111' }}>{children}</h1>;
 }
 
 export function Subtitle({ children }: { children: React.ReactNode }) {
@@ -81,7 +81,8 @@ export function PrimaryButton({
       onClick={onClick}
       style={{
         width: '100%',
-        padding: 14,
+        padding: '14px 16px',
+        minHeight: 48,
         background: disabled ? '#999' : '#111',
         color: 'white',
         border: 'none',
@@ -89,6 +90,8 @@ export function PrimaryButton({
         fontSize: 15,
         fontWeight: 500,
         cursor: disabled ? 'not-allowed' : 'pointer',
+        WebkitTapHighlightColor: 'transparent',
+        touchAction: 'manipulation',
         ...style,
       }}
     >
@@ -112,7 +115,8 @@ export function SecondaryButton({
       onClick={onClick}
       style={{
         width: '100%',
-        padding: 14,
+        padding: '14px 16px',
+        minHeight: 48,
         background: 'white',
         color: '#111',
         border: '1px solid #e5e5e5',
@@ -120,6 +124,8 @@ export function SecondaryButton({
         fontSize: 15,
         fontWeight: 500,
         cursor: 'pointer',
+        WebkitTapHighlightColor: 'transparent',
+        touchAction: 'manipulation',
         ...style,
       }}
     >

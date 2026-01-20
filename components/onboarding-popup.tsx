@@ -1,7 +1,18 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { PrimaryButton, SecondaryButton } from './ui';
+
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 640);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
+  return isMobile;
+}
 
 export function PoolOnboardingPopup({
   open,
@@ -15,6 +26,7 @@ export function PoolOnboardingPopup({
   onJoinWithInvite: () => void;
 }) {
   const [step, setStep] = useState(0);
+  const isMobile = useIsMobile();
 
   const steps = useMemo(
     () => [
@@ -152,36 +164,78 @@ export function PoolOnboardingPopup({
         inset: 0,
         background: 'rgba(0,0,0,0.4)',
         display: 'flex',
-        alignItems: 'center',
+        alignItems: isMobile ? 'flex-end' : 'center',
         justifyContent: 'center',
-        padding: 20,
+        padding: isMobile ? 0 : 20,
         zIndex: 50,
       }}
     >
-      <div style={{ width: '100%', maxWidth: 400, background: 'white', borderRadius: 16, overflow: 'hidden' }}>
-        <div style={{ padding: '24px 24px 0 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div style={{ 
+        width: '100%', 
+        maxWidth: isMobile ? '100%' : 400, 
+        maxHeight: isMobile ? '90vh' : 'auto',
+        background: 'white', 
+        borderRadius: isMobile ? '16px 16px 0 0' : 16, 
+        overflow: 'hidden',
+        display: 'flex',
+        flexDirection: 'column',
+      }}>
+        <div style={{ 
+          padding: isMobile ? '20px 20px 0 20px' : '24px 24px 0 24px', 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center',
+          flexShrink: 0,
+        }}>
           <div style={{ fontSize: 10, color: '#999', textTransform: 'uppercase', letterSpacing: 0.5 }}>Pool</div>
           <button
             onClick={onClose}
-            style={{ background: 'none', border: 'none', fontSize: 20, color: '#999', cursor: 'pointer', padding: 0, lineHeight: 1 }}
+            style={{ 
+              background: 'none', 
+              border: 'none', 
+              fontSize: 20, 
+              color: '#999', 
+              cursor: 'pointer', 
+              padding: 8, 
+              margin: -8,
+              lineHeight: 1,
+              minWidth: 44,
+              minHeight: 44,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
           >
             ×
           </button>
         </div>
 
-        <div style={{ padding: '20px 24px 24px 24px' }}>
-          <h2 style={{ fontSize: 24, fontWeight: 600, color: '#111', margin: '0 0 20px 0' }}>{steps[step].title}</h2>
+        <div style={{ 
+          padding: isMobile ? '16px 20px 20px 20px' : '20px 24px 24px 24px',
+          overflowY: 'auto',
+          flex: 1,
+        }}>
+          <h2 style={{ fontSize: isMobile ? 22 : 24, fontWeight: 600, color: '#111', margin: '0 0 20px 0' }}>{steps[step].title}</h2>
           {steps[step].content}
         </div>
 
-        <div style={{ padding: '16px 24px 24px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div style={{ display: 'flex', gap: 6 }}>
+        <div style={{ 
+          padding: isMobile ? '16px 20px 24px 20px' : '16px 24px 24px 24px', 
+          display: 'flex', 
+          flexDirection: isMobile ? 'column-reverse' : 'row',
+          justifyContent: 'space-between', 
+          alignItems: isMobile ? 'stretch' : 'center',
+          gap: isMobile ? 12 : 0,
+          flexShrink: 0,
+          borderTop: isMobile ? '1px solid #f0f0f0' : 'none',
+        }}>
+          <div style={{ display: 'flex', gap: 6, justifyContent: isMobile ? 'center' : 'flex-start' }}>
             {steps.map((_, i) => (
               <div
                 key={i}
                 style={{
-                  width: 6,
-                  height: 6,
+                  width: 8,
+                  height: 8,
                   borderRadius: '50%',
                   background: i === step ? '#111' : '#e5e5e5',
                   cursor: 'pointer',
@@ -191,18 +245,20 @@ export function PoolOnboardingPopup({
             ))}
           </div>
 
-          <div style={{ display: 'flex', gap: 12 }}>
+          <div style={{ display: 'flex', gap: 12, justifyContent: isMobile ? 'stretch' : 'flex-end' }}>
             {step > 0 ? (
               <button
                 onClick={() => setStep(step - 1)}
                 style={{
-                  padding: '10px 20px',
+                  flex: isMobile ? 1 : 'none',
+                  padding: isMobile ? '14px 20px' : '10px 20px',
                   background: 'white',
                   border: '1px solid #e5e5e5',
-                  borderRadius: 6,
+                  borderRadius: 8,
                   fontSize: 14,
                   color: '#666',
                   cursor: 'pointer',
+                  minHeight: 44,
                 }}
               >
                 Back
@@ -212,13 +268,15 @@ export function PoolOnboardingPopup({
               <button
                 onClick={() => setStep(step + 1)}
                 style={{
-                  padding: '10px 20px',
+                  flex: isMobile ? 1 : 'none',
+                  padding: isMobile ? '14px 20px' : '10px 20px',
                   background: '#111',
                   border: 'none',
-                  borderRadius: 6,
+                  borderRadius: 8,
                   fontSize: 14,
                   color: 'white',
                   cursor: 'pointer',
+                  minHeight: 44,
                 }}
               >
                 Next

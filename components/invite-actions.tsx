@@ -1,10 +1,22 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { PrimaryButton, SecondaryButton } from './ui';
+
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 640);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
+  return isMobile;
+}
 
 export function InviteActions({ inviteLink, poolName }: { inviteLink: string; poolName: string }) {
   const [copied, setCopied] = useState(false);
+  const isMobile = useIsMobile();
 
   const message = useMemo(() => {
     return `Join my Fuse Collective Pool (${poolName}): ${inviteLink}`;
@@ -26,11 +38,11 @@ export function InviteActions({ inviteLink, poolName }: { inviteLink: string; po
         {copied ? 'Copied' : 'Copy invite link'}
       </PrimaryButton>
 
-      <div style={{ display: 'flex', gap: 8 }}>
-        <a href={whatsappHref} style={{ flex: 1 }}>
+      <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: 8 }}>
+        <a href={whatsappHref} style={{ flex: 1, textDecoration: 'none' }}>
           <SecondaryButton style={{ width: '100%' }}>Share via WhatsApp</SecondaryButton>
         </a>
-        <a href={smsHref} style={{ flex: 1 }}>
+        <a href={smsHref} style={{ flex: 1, textDecoration: 'none' }}>
           <SecondaryButton style={{ width: '100%' }}>Share via SMS</SecondaryButton>
         </a>
       </div>
