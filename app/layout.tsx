@@ -4,8 +4,8 @@ import { PrivyAppProvider } from '../components/privy-provider';
 import { Header } from '../components/header';
 
 export const metadata: Metadata = {
-  title: 'Fuse · Collective Pool',
-  description: 'Fuse Collective Pool demo (Next.js + Privy, mocked data)',
+  title: 'Fuse · Pool Demo',
+  description: 'Fuse Pool demo (Next.js + Privy, mocked data)',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
